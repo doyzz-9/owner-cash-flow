@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>JB Cash Flow Admin</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root { 
+    --bg-dark: #09090b; 
+    --surface-dark: #18181b; 
+    --theme-blue: #007aff; 
+    --theme-red: #ef4444; 
+    --text-main: #fafafa;
+    --text-muted: #a1a1aa;
+    --ios-spring: cubic-bezier(0.25, 0.8, 0.25, 1); 
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-dark); color: var(--text-main); }
+  
+  .page { display: none; min-height: 100vh; }
+  .page.active { display: block; animation: pageFadeIn 0.4s var(--ios-spring) forwards; }
+  @keyframes pageFadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+  .login-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 24px; background: radial-gradient(circle at top right, #007aff20, var(--bg-dark) 60%); }
+  .login-form { background: rgba(24, 24, 27, 0.8); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.08); padding: 32px; border-radius: 28px; box-shadow: 0 20px 50px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; }
+  .input-group input { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 15px; background: rgba(255,255,255,0.03); color: #fff; outline: none; margin-top: 8px; transition: all 0.3s; font-family: inherit; font-weight: 500; }
+  .input-group input:focus { border-color: var(--theme-blue); background: rgba(255,255,255,0.08); box-shadow: 0 0 20px rgba(0,122,255,0.2); }
+  .btn-primary { padding: 16px; background: var(--theme-blue); color: #fff; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.2s var(--ios-spring); box-shadow: 0 8px 20px rgba(0,122,255,0.3); width: 100%; }
+  .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+  
+  .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; background: rgba(9, 9, 11, 0.8); backdrop-filter: blur(24px); position: sticky; top: 0; z-index: 50; border-bottom: 1px solid rgba(255,255,255,0.05); }
+  .dashboard-content { padding: 24px; padding-bottom: 80px; }
+  
+  .admin-product-item { display: flex; align-items: center; gap: 16px; background: var(--surface-dark); border: 1px solid rgba(255,255,255,0.06); padding: 16px; border-radius: 20px; margin-bottom: 14px; box-shadow: 0 4px 15px rgba(0,0,0,0.2); }
+  .admin-product-item img { width: 75px; height: 75px; border-radius: 16px; object-fit: cover; border: 1px solid rgba(255,255,255,0.1); }
+  .btn-icon { background: rgba(255,59,48,0.1); color: var(--theme-red); border: 1px solid rgba(255,59,48,0.2); width: 44px; height: 44px; border-radius: 14px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: all 0.2s; flex-shrink: 0; }
+  .btn-icon:active { transform: scale(0.9); background: rgba(255,59,48,0.2); }
+  
+  .log-container { background: var(--surface-dark); border: 1px solid rgba(255,255,255,0.06); padding: 24px; border-radius: 24px; }
+  .log-item { display: flex; gap: 16px; position: relative; padding-bottom: 24px; }
+  .log-item:last-child { padding-bottom: 0; }
+  .log-item::before { content: ''; position: absolute; left: 6px; top: 20px; bottom: 0; width: 2px; background: rgba(255,255,255,0.08); }
+  .log-item:last-child::before { display: none; }
+  .log-dot { width: 14px; height: 14px; border-radius: 50%; background: var(--theme-blue); margin-top: 4px; border: 3px solid var(--surface-dark); box-shadow: 0 0 10px var(--theme-blue); z-index: 2; flex-shrink: 0; }
+  .log-content { flex: 1; }
+  .log-text { font-size: 14px; font-weight: 600; color: #e4e4e7; line-height: 1.4; margin-bottom: 4px; }
+  .log-time { font-size: 12px; color: var(--text-muted); font-weight: 500; }
+
+  .form-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 100; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s var(--ios-spring); }
+  .form-overlay.show { transform: translateY(0); }
+  .form-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(9,9,11,0.8); backdrop-filter: blur(10px); position: sticky; top: 0; }
+  .form-body { padding: 24px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 20px; }
+  
+  .form-card { display: flex; flex-direction: column; gap: 16px; }
+  .form-card input, .form-card select, .form-card textarea { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; background: rgba(255,255,255,0.04); color: #fff; outline: none; font-family: inherit; transition: all 0.2s; font-weight: 500; }
+  .form-card input:focus, .form-card select:focus, .form-card textarea:focus { border-color: var(--theme-blue); background: rgba(255,255,255,0.08); box-shadow: 0 0 15px rgba(0,122,255,0.15); }
+  .form-card select option { background: var(--surface-dark); color: #fff; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  
+  .upload-area { border: 2px dashed rgba(255,255,255,0.15); border-radius: 20px; padding: 32px 24px; text-align: center; cursor: pointer; color: var(--text-muted); display: flex; flex-direction: column; align-items: center; gap: 12px; transition: all 0.2s; background: rgba(255,255,255,0.02); }
+  .upload-area:hover { border-color: var(--theme-blue); color: var(--theme-blue); background: rgba(0,122,255,0.05); }
+  .upload-area img { max-width: 100%; max-height: 180px; border-radius: 16px; margin-top: 16px; object-fit: cover; box-shadow: 0 10px 25px rgba(0,0,0,0.5); }
+</style>
+</head>
+<body>
+
+<div id="page-login" class="page active">
+  <div class="login-container">
+    <div class="login-form">
+      <div style="text-align: center; margin-bottom: 10px;">
+        <h2 style="font-size: 32px; letter-spacing: -1px; color: #fff; font-weight: 800;">ᴊʙ ᴄᴀꜱʜ ꜰʟᴏᴡ</h2>
+        <p style="color: var(--text-muted); margin-top: 8px; font-size: 14px; font-weight: 500;">ꜱᴇʟᴀᴍᴀᴛ ᴅᴀᴛᴀɴɢ ᴋᴇᴍʙᴀʟɪ, ᴀᴅᴍɪɴ.</p>
+      </div>
+      <div class="input-group"><input type="text" id="login-username" placeholder="ᴜꜱᴇʀɴᴀᴍᴇ"></div>
+      <div class="input-group"><input type="password" id="login-password" placeholder="ᴘᴀꜱꜱᴡᴏʀᴅ"></div>
+      <button class="btn-primary" onclick="doLogin()" style="margin-top: 10px;">ᴍᴀꜱᴜᴋ ᴅᴀꜱʜʙᴏᴀʀᴅ</button>
+    </div>
+  </div>
+</div>
+
+<div id="page-dashboard" class="page">
+  <div class="dashboard-header">
+    <h2 style="font-size: 22px; letter-spacing: -0.5px; color: #fff; font-weight: 700;">ᴅᴀꜱʜʙᴏᴀʀᴅ</h2>
+    <button class="btn-icon" style="width:auto; padding: 0 16px; font-weight: 700; font-size: 13px; color: var(--text-main); background: rgba(255,255,255,0.1); border: none;" onclick="doLogout()">ᴋᴇʟᴜᴀʀ</button>
+  </div>
+
+  <div class="dashboard-content">
+    <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 20px;">
+      <h3 style="font-size: 18px; letter-spacing: -0.5px; color: #fff; font-weight: 700;">ᴅᴀꜰᴛᴀʀ ᴘʀᴏᴅᴜᴋ</h3>
+      <button class="btn-primary" style="padding: 10px 20px; width:auto; font-size: 14px; border-radius: 12px; box-shadow: none;" onclick="toggleForm()">
+        <i class="fa-solid fa-plus"></i> ᴛᴀᴍʙᴀʜ
+      </button>
+    </div>
+
+    <div id="admin-product-list"></div>
+
+    <h3 style="margin-top:36px; margin-bottom:20px; font-size: 18px; letter-spacing: -0.5px; color: #fff; font-weight: 700;">ᴊᴇᴊᴀᴋ ᴀᴋᴛɪᴠɪᴛᴀꜱ</h3>
+    <div id="log-list" class="log-container"></div>
+
+    <h3 style="margin-top:36px; margin-bottom:20px; font-size: 18px; letter-spacing: -0.5px; color: #fff; font-weight: 700;">ᴘᴇɴɢᴀᴛᴜʀᴀɴ ʙᴀɴᴛᴜᴀɴ</h3>
+    <div style="background: var(--surface-dark); border: 1px solid rgba(255,255,255,0.06); padding: 24px; border-radius: 24px;">
+      <textarea id="bantuan-teks" style="min-height: 120px; width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 14px; background: rgba(255,255,255,0.04); color: #fff; outline: none; font-family: inherit; resize: vertical;"></textarea>
+      <button class="btn-primary" onclick="simpanBantuan()" style="margin-top: 16px;">ꜱɪᴍᴘᴀɴ ʙᴀɴᴛᴜᴀɴ</button>
+    </div>
+  </div>
+</div>
+
+<div class="form-overlay" id="form-overlay">
+  <div class="form-header">
+    <h3 style="font-size: 20px; color: #fff; font-weight: 700;">ᴛᴀᴍʙᴀʜ ᴘʀᴏᴅᴜᴋ</h3>
+    <button style="background: transparent; border: none; color: var(--text-muted); font-size: 15px; font-weight: 600; cursor: pointer; padding: 8px;" onclick="toggleForm()">ʙᴀᴛᴀʟ</button>
+  </div>
+  
+  <div class="form-body">
+    <div class="form-card">
+      <input type="text" id="inp-nama" placeholder="ɴᴀᴍᴀ ᴘʀᴏᴅᴜᴋ (ᴄᴛʜ: ᴀᴋᴜɴ ꜰꜰ ꜱᴜʟᴛᴀɴ)">
+      <div class="form-row">
+        <input type="number" id="inp-harga" placeholder="ʜᴀʀɢᴀ ᴊᴜᴀʟ">
+        <input type="number" id="inp-harga-coret" placeholder="ʜᴀʀɢᴀ ᴄᴏʀᴇᴛ">
+      </div>
+      <div class="form-row">
+        <select id="inp-kategori">
+          <option value="Free Fire">ꜰʀᴇᴇ ꜰɪʀᴇ</option>
+          <option value="Mobile Legends">ᴍᴏʙɪʟᴇ ʟᴇɢᴇɴᴅꜱ</option>
+          <option value="Flash Sale">ꜰʟᴀꜱʜ ꜱᴀʟᴇ</option>
+          <option value="Pelajar">ᴘᴇʟᴀᴊᴀʀ</option>
+        </select>
+        <input type="text" id="inp-wa" placeholder="ɴᴏ ᴡᴀ (628...)">
+      </div>
+      
+      <div class="upload-area" onclick="document.getElementById('inp-file').click()">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:32px;"></i>
+        <span id="upload-text" style="font-weight: 600; font-size: 14px;">ᴘɪʟɪʜ ꜰᴏᴛᴏ ᴅᴀʀɪ ɢᴀʟᴇʀɪ</span>
+        <img id="preview-img" style="display:none;">
+      </div>
+      <input type="file" id="inp-file" accept="image/*" style="display: none;" onchange="previewGambar(event)">
+      
+      <input type="text" id="inp-promo" placeholder="ʟᴀʙᴇʟ ᴘʀᴏᴍᴏ (ᴄᴛʜ: 50% ᴏꜰꜰ)">
+    </div>
+    
+    <button class="btn-primary" onclick="tambahProduk()" style="margin-top: 10px; padding: 18px; font-size: 16px;">ꜱɪᴍᴘᴀɴ ᴘʀᴏᴅᴜᴋ</button>
+  </div>
+</div>
+
+<script>
+  function toAesthetic(str) {
+    if(!str) return "";
+    const map = { 'a':'ᴀ','b':'ʙ','c':'ᴄ','d':'ᴅ','e':'ᴇ','f':'ꜰ','g':'ɢ','h':'ʜ','i':'ɪ','j':'ᴊ','k':'ᴋ','l':'ʟ','m':'ᴍ','n':'ɴ','o':'ᴏ','p':'ᴘ','q':'ǫ','r':'ʀ','s':'ꜱ','t':'ᴛ','u':'ᴜ','v':'ᴠ','w':'ᴡ','x':'x','y':'ʏ','z':'ᴢ','A':'ᴀ','B':'ʙ','C':'ᴄ','D':'ᴅ','E':'ᴇ','F':'ꜰ','G':'ɢ','H':'ʜ','I':'ɪ','J':'ᴊ','K':'ᴋ','L':'ʟ','M':'ᴍ','N':'ɴ','O':'ᴏ','P':'ᴘ','Q':'ǫ','R':'ʀ','S':'ꜱ','T':'ᴛ','U':'ᴜ','V':'ᴠ','W':'ᴡ','X':'x','Y':'ʏ','Z':'ᴢ' };
+    return str.split('').map(char => map[char] || char).join('');
+  }
+
+  const getDB = (key) => JSON.parse(localStorage.getItem('jb_' + key)) || [];
+  const setDB = (key, val) => localStorage.setItem('jb_' + key, JSON.stringify(val));
+
+  let products = getDB('products');
+  let logs = getDB('logs');
+  let bantuanText = localStorage.getItem('jb_bantuan') || "Hubungi admin JB Cash Flow di +62 883-8003-5722 untuk bantuan.";
+
+  let token = localStorage.getItem('admin_token') || null;
+  let base64Img = null;
+
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+
+  function doLogin() {
+    const u = document.getElementById('login-username').value;
+    const p = document.getElementById('login-password').value;
+    
+    // LOGIN SEMENTARA (TANPA BACKEND)
+    if (u === 'JB Cash Flow' && p === '12123242') {
+      token = 'admin-login';
+      localStorage.setItem('admin_token', token);
+      showPage('page-dashboard');
+      loadDashboard();
+    } else { alert("Username atau Password salah!"); }
+  }
+
+  function doLogout() {
+    localStorage.removeItem('admin_token');
+    token = null;
+    showPage('page-login');
+  }
+
+  function previewGambar(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById('preview-img').src = e.target.result;
+        document.getElementById('preview-img').style.display = 'block';
+        document.getElementById('upload-text').innerText = "ɢᴀɴᴛɪ ꜰᴏᴛᴏ";
+        base64Img = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function toggleForm() {
+    const form = document.getElementById('form-overlay');
+    form.classList.toggle('show');
+  }
+
+  function tambahProduk() {
+    const payload = {
+      id: Date.now(),
+      name: document.getElementById('inp-nama').value,
+      price: document.getElementById('inp-harga').value,
+      old_price: document.getElementById('inp-harga-coret').value || null,
+      kategori: document.getElementById('inp-kategori').value,
+      wa: document.getElementById('inp-wa').value,
+      image: base64Img || 'https://placehold.co/400x400/18181b/a1a1aa?text=No+Img',
+      promo: document.getElementById('inp-promo').value
+    };
+
+    if (!payload.name || !payload.price || !payload.wa) return alert("Lengkapi data terlebih dahulu!");
+
+    products.push(payload);
+    setDB('products', products);
+    
+    const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    logs.push({ message: `Menambahkan produk: ${payload.name}`, created_at: jam, timestamp: Date.now() });
+    setDB('logs', logs);
+
+    base64Img = null;
+    document.getElementById('inp-nama').value = '';
+    document.getElementById('inp-harga').value = '';
+    document.getElementById('inp-harga-coret').value = '';
+    document.getElementById('inp-wa').value = '';
+    document.getElementById('inp-promo').value = '';
+    document.getElementById('preview-img').style.display = 'none';
+    document.getElementById('upload-text').innerText = "ᴘɪʟɪʜ ꜰᴏᴛᴏ ᴅᴀʀɪ ɢᴀʟᴇʀɪ";
+    toggleForm();
+    loadDashboard();
+  }
+
+  function hapusProduk(id) {
+    if (!confirm("Hapus produk ini (Laku)?")) return;
+    const product = products.find(p => p.id === id);
+    products = products.filter(p => p.id !== id);
+    setDB('products', products);
+    
+    const jam = new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' });
+    logs.push({ message: `Menghapus produk (Laku): ${product.name}`, created_at: jam, timestamp: Date.now() });
+    setDB('logs', logs);
+    
+    loadDashboard();
+  }
+
+  function simpanBantuan() {
+    bantuanText = document.getElementById('bantuan-teks').value;
+    localStorage.setItem('jb_bantuan', bantuanText);
+    alert("Tersimpan!");
+    loadDashboard();
+  }
+
+  function loadDashboard() {
+    // Bersihin log > 5 menit
+    const now = Date.now();
+    logs = logs.filter(log => (now - log.timestamp) < 300000);
+    setDB('logs', logs);
+
+    // Render List Produk
+    const pList = document.getElementById('admin-product-list');
+    pList.innerHTML = products.length ? products.map(p => `
+      <div class="admin-product-item">
+        <img src="${p.image}">
+        <div style="flex:1;">
+          <h4 style="font-size:15px; font-weight:700; margin-bottom: 4px; line-height: 1.3; color: #fff;">${toAesthetic(p.name)}</h4>
+          <div style="font-size:12px; color:var(--text-muted); font-weight: 600; margin-bottom: 6px;">${toAesthetic(p.kategori)}</div>
+          <div style="font-size:16px; color:var(--theme-blue); font-weight:800;">Rp ${Number(p.price).toLocaleString('id-ID')}</div>
+        </div>
+        <button class="btn-icon" onclick="hapusProduk(${p.id})"><i class="fa-solid fa-check"></i></button>
+      </div>
+    `).join('') : '<p style="text-align:center; color:var(--text-muted); font-size:14px; font-weight:600; padding: 20px 0; background: var(--surface-dark); border-radius: 20px;">ʙᴇʟᴜᴍ ᴀᴅᴀ ᴘʀᴏᴅᴜᴋ.</p>';
+
+    // Render Log
+    const lList = document.getElementById('log-list');
+    lList.innerHTML = logs.length ? logs.slice().reverse().map(l => `
+      <div class="log-item">
+        <div class="log-dot"></div>
+        <div class="log-content">
+          <div class="log-text">${toAesthetic(l.message)}</div>
+          <div class="log-time">${l.created_at}</div>
+        </div>
+      </div>
+    `).join('') : '<p style="text-align:center; color:var(--text-muted); font-size:14px; font-weight:600; padding: 20px 0;">ʙᴇʟᴜᴍ ᴀᴅᴀ ʟᴏɢ.</p>';
+
+    document.getElementById('bantuan-teks').value = bantuanText;
+  }
+
+  if (token) {
+    showPage('page-dashboard');
+    loadDashboard();
+  } else {
+    showPage('page-login');
+  }
+</script>
+</body>
+</html>
