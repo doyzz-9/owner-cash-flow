@@ -6,34 +6,66 @@
 <title>JB Cash Flow Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-  :root { --bg-dark: #09090b; --surface-dark: #18181b; --theme-blue: #007aff; --theme-red: #ef4444; --theme-green: #10b981; --text-main: #fafafa; --text-muted: #a1a1aa; }
+  :root { 
+    --bg-dark: #09090b; 
+    --surface-dark: #18181b; 
+    --surface-light: #27272a;
+    --theme-blue: #007aff; 
+    --theme-red: #ef4444; 
+    --theme-green: #10b981; 
+    --text-main: #fafafa; 
+    --text-muted: #a1a1aa;
+    --ios-spring: cubic-bezier(0.25, 0.8, 0.25, 1);
+  }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { font-family: -apple-system, sans-serif; background: var(--bg-dark); color: var(--text-main); }
-  .page { display: none; min-height: 100vh; } .page.active { display: block; }
-  .toast-container { position: fixed; top: 20px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 9999; pointer-events: none; }
-  .toast { background: #222; color: #fff; padding: 12px 24px; border-radius: 16px; font-size: 14px; font-weight: 600; margin-bottom: 10px; transition: 0.3s; opacity: 0; transform: translateY(-20px); }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-dark); color: var(--text-main); }
+  
+  .page { display: none; min-height: 100vh; } 
+  .page.active { display: block; }
+
+  /* CUSTOM TOAST */
+  .toast-container { position: fixed; top: 24px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 9999; pointer-events: none; }
+  .toast { 
+    background: var(--surface-dark); color: #fff; padding: 14px 24px; border-radius: 16px; font-size: 14px; font-weight: 600; 
+    margin-bottom: 10px; transition: 0.3s var(--ios-spring); opacity: 0; transform: translateY(-20px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 10px;
+  }
   .toast.show { opacity: 1; transform: translateY(0); }
-  .toast.success { border-left: 4px solid var(--theme-green); } .toast.error { border-left: 4px solid var(--theme-red); }
-  .login-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 24px; background: var(--bg-dark); }
-  .login-form { background: var(--surface-dark); padding: 32px; border-radius: 20px; border: 1px solid #222; }
-  .input-group input { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid #333; font-size: 15px; background: #111; color: #fff; margin-top: 8px; outline: none; }
-  .input-group input:focus { border-color: var(--theme-blue); }
-  .btn-primary { padding: 16px; background: var(--theme-blue); color: #fff; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; }
-  .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 20px 24px; border-bottom: 1px solid #222; position: sticky; top: 0; background: var(--bg-dark); z-index: 10; }
-  .dashboard-content { padding: 24px; padding-bottom: 80px; }
-  .admin-product-item { display: flex; align-items: center; gap: 16px; background: var(--surface-dark); padding: 16px; border-radius: 16px; margin-bottom: 14px; border: 1px solid #222; }
-  .admin-product-item img { width: 75px; height: 75px; border-radius: 12px; object-fit: cover; }
-  .btn-icon { background: #2a1a1a; color: var(--theme-red); border: none; width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0; }
-  .log-container { background: var(--surface-dark); padding: 20px; border-radius: 16px; border: 1px solid #222; }
-  .form-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 100; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.2s; }
+  .toast.success { border-left: 4px solid var(--theme-green); } 
+  .toast.error { border-left: 4px solid var(--theme-red); }
+
+  /* LOGIN */
+  .login-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 32px; background: radial-gradient(circle at top right, rgba(0,122,255,0.15), var(--bg-dark) 60%); }
+  .login-form { background: var(--surface-dark); padding: 32px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; }
+  .input-group input { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 15px; background: var(--surface-light); color: #fff; outline: none; transition: 0.3s; font-weight: 500; }
+  .input-group input:focus { border-color: var(--theme-blue); box-shadow: 0 0 0 4px rgba(0,122,255,0.2); }
+  .btn-primary { padding: 18px; background: var(--theme-blue); color: #fff; border: none; border-radius: 16px; font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; transition: 0.2s var(--ios-spring); box-shadow: 0 8px 20px rgba(0,122,255,0.3); }
+  .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+
+  /* DASHBOARD */
+  .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; background: rgba(9,9,11,0.9); backdrop-filter: blur(20px); z-index: 10; }
+  .dashboard-content { padding: 24px; padding-bottom: 100px; }
+  
+  .admin-product-item { display: flex; align-items: center; gap: 16px; background: var(--surface-dark); padding: 16px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); }
+  .admin-product-item img { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; }
+  .btn-icon { background: rgba(255,59,48,0.15); color: var(--theme-red); border: none; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+  .btn-icon:active { transform: scale(0.9); }
+
+  /* FORM FULL SCREEN */
+  .form-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); z-index: 100; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.4s var(--ios-spring); }
   .form-overlay.show { transform: translateY(0); }
-  .form-header { display: flex; justify-content: space-between; padding: 20px; border-bottom: 1px solid #222; }
-  .form-body { padding: 20px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 16px; }
-  .form-card input, .form-card select, .form-card textarea { width: 100%; padding: 16px; border-radius: 12px; border: 1px solid #333; font-size: 14px; background: #111; color: #fff; outline: none; }
+  .form-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(9,9,11,0.9); position: sticky; top: 0; }
+  .form-body { padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
+  
+  .form-card { display: flex; flex-direction: column; gap: 16px; }
+  .form-card input, .form-card select, .form-card textarea { width: 100%; padding: 16px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 15px; background: var(--surface-light); color: #fff; outline: none; transition: 0.2s; font-family: inherit; }
   .form-card input:focus, .form-card select:focus { border-color: var(--theme-blue); }
-  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-  .upload-area { border: 2px dashed #333; border-radius: 16px; padding: 24px; text-align: center; cursor: pointer; background: #111; color: var(--text-muted); }
-  .upload-area img { max-width: 100%; max-height: 150px; border-radius: 12px; margin-top: 10px; }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  
+  .upload-area { border: 2px dashed rgba(255,255,255,0.2); border-radius: 20px; padding: 32px; text-align: center; cursor: pointer; background: var(--surface-light); color: var(--text-muted); transition: 0.2s; }
+  .upload-area:hover { border-color: var(--theme-blue); color: var(--theme-blue); }
+  .upload-area img { max-width: 100%; max-height: 180px; border-radius: 16px; margin-top: 16px; object-fit: cover; }
 </style>
 </head>
 <body>
@@ -43,35 +75,37 @@
 <div id="page-login" class="page active">
   <div class="login-container">
     <div class="login-form">
-      <h2 style="text-align:center; margin-bottom: 20px; color: #fff;">JB CASH FLOW</h2>
+      <h2 style="text-align:center; margin-bottom: 10px; color: #fff; font-size: 32px; letter-spacing: -1px;">JB CASH FLOW</h2>
+      <p style="text-align:center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Masuk ke Dashboard Admin</p>
       <div class="input-group"><input type="text" id="login-username" placeholder="Username"></div>
       <div class="input-group"><input type="password" id="login-password" placeholder="Password"></div>
-      <button class="btn-primary" onclick="doLogin()" style="margin-top: 20px;">MASUK</button>
+      <button class="btn-primary" onclick="doLogin()" style="margin-top: 10px;">MASUK</button>
     </div>
   </div>
 </div>
 
 <div id="page-dashboard" class="page">
   <div class="dashboard-header">
-    <h2 style="font-size: 20px; color: #fff;">Dashboard</h2>
-    <button class="btn-icon" style="width:auto; padding: 0 16px; background: #222; color: #fff;" onclick="doLogout()">KELUAR</button>
+    <h2 style="font-size: 22px; color: #fff; font-weight: 700;">Dashboard</h2>
+    <button class="btn-icon" style="width:auto; padding: 0 20px; background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; font-size: 14px;" onclick="doLogout()">KELUAR</button>
   </div>
   <div class="dashboard-content">
-    <div style="display:flex; justify-content:space-between; margin-bottom: 20px;">
-      <h3 style="font-size: 18px; color: #fff;">Daftar Produk</h3>
-      <button class="btn-primary" style="width:auto; padding: 10px 20px; border-radius: 8px;" onclick="toggleForm()">+ Tambah</button>
+    <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 24px;">
+      <h3 style="font-size: 20px; color: #fff; font-weight: 700;">Daftar Produk</h3>
+      <button class="btn-primary" style="width:auto; padding: 12px 24px; border-radius: 12px; font-size: 14px;" onclick="toggleForm()">+ Tambah</button>
     </div>
+    
     <div id="admin-product-list"></div>
     
-    <h3 style="margin-top:30px; margin-bottom:15px; font-size: 18px; color: #fff;">Jejak Aktivitas</h3>
-    <div id="log-list" class="log-container"></div>
+    <h3 style="margin-top:40px; margin-bottom:20px; font-size: 20px; color: #fff; font-weight: 700;">Jejak Aktivitas</h3>
+    <div id="log-list" style="background: var(--surface-dark); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);"></div>
   </div>
 </div>
 
 <div class="form-overlay" id="form-overlay">
   <div class="form-header">
-    <h3 style="font-size: 18px; color: #fff;">Tambah Produk</h3>
-    <button style="background: none; border: none; color: var(--text-muted); font-size: 15px; font-weight: 600;" onclick="toggleForm()">BATAL</button>
+    <h3 style="font-size: 20px; color: #fff;">Tambah Produk</h3>
+    <button style="background: none; border: none; color: var(--text-muted); font-size: 16px; font-weight: 600;" onclick="toggleForm()">BATAL</button>
   </div>
   <div class="form-body">
     <div class="form-card">
@@ -81,18 +115,20 @@
         <input type="number" id="inp-harga-coret" placeholder="Harga Coret">
       </div>
       <div class="form-row">
-        <select id="inp-kategori"><option>Free Fire</option><option>Mobile Legends</option><option>Flash Sale</option><option>Pelajar</option></select>
+        <select id="inp-kategori">
+          <option>Free Fire</option><option>Mobile Legends</option><option>Flash Sale</option><option>Pelajar</option>
+        </select>
         <input type="text" id="inp-wa" placeholder="No WA (628...)">
       </div>
       <div class="upload-area" onclick="document.getElementById('inp-file').click()">
-        <i class="fa-solid fa-cloud-arrow-up" style="font-size:24px;"></i>
-        <p id="upload-text">Pilih Foto</p>
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:32px; margin-bottom: 10px;"></i>
+        <p id="upload-text" style="font-weight: 600; font-size: 15px;">Pilih Foto dari Galeri</p>
         <img id="preview-img" style="display:none;">
       </div>
       <input type="file" id="inp-file" accept="image/*" style="display: none;" onchange="previewGambar(event)">
-      <input type="text" id="inp-promo" placeholder="Label Promo">
+      <input type="text" id="inp-promo" placeholder="Label Promo (Opsional)">
     </div>
-    <button class="btn-primary" onclick="tambahProduk()" style="margin-top: 10px;">SIMPAN PRODUK</button>
+    <button class="btn-primary" onclick="tambahProduk()" style="margin-top: 10px; padding: 20px; font-size: 18px;">SIMPAN PRODUK</button>
   </div>
 </div>
 
@@ -101,7 +137,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
   import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // GANTI PAKE CONFIG DARI FIREBASE LO (SAMA KAYAK YANG DI INDEX.HTML)
+  // GANTI PAKE CONFIG DARI FIREBASE LO
   const firebaseConfig = {
     apiKey: "MASUKIN_API_KEY_LO",
     authDomain: "MASUKIN_AUTH_DOMAIN_LO",
@@ -128,13 +164,12 @@
 <script>
   let base64Img = null;
   let token = localStorage.getItem('admin_token') || null;
-  let products = [];
 
   function showToast(msg, type) {
     const c = document.getElementById('toast-container');
     const t = document.createElement('div');
     t.className = `toast ${type}`;
-    t.innerText = msg;
+    t.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i> ${msg}`;
     c.appendChild(t);
     setTimeout(() => t.classList.add('show'), 10);
     setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
@@ -149,7 +184,6 @@
     if (document.getElementById('login-username').value === 'JB Cash Flow' && document.getElementById('login-password').value === '12123242') {
       localStorage.setItem('admin_token', 'admin');
       showPage('page-dashboard');
-      loadDashboard();
       showToast('Login Berhasil!', 'success');
     } else { showToast('Username atau Password salah!', 'error'); }
   }
@@ -181,13 +215,23 @@
     }
   }
 
-  function toggleForm() { document.getElementById('form-overlay').classList.toggle('show'); }
+  function toggleForm() { 
+    const form = document.getElementById('form-overlay');
+    form.classList.toggle('show'); 
+  }
 
   async function tambahProduk() {
     const name = document.getElementById('inp-nama').value;
     const price = document.getElementById('inp-harga').value;
     const wa = document.getElementById('inp-wa').value;
-    if(!name || !price || !wa) return showToast('Lengkapi data terlebih dahulu!', 'error');
+    
+    if(!name || !price || !wa) return showToast('Nama, Harga, dan WA wajib diisi!', 'error');
+
+    // Tombol loading
+    const btn = document.querySelector('.form-body .btn-primary');
+    const originalText = btn.innerText;
+    btn.innerText = 'MENYIMPAN...';
+    btn.disabled = true;
 
     const payload = {
       name, price, wa,
@@ -198,16 +242,26 @@
       created_at: Date.now()
     };
 
-    await window.fsAddProduct(payload);
-    toggleForm();
-    showToast('Produk ditambahkan ke server!', 'success');
-    
-    document.getElementById('inp-nama').value = '';
-    document.getElementById('inp-harga').value = '';
-    document.getElementById('inp-wa').value = '';
-    document.getElementById('preview-img').style.display = 'none';
-    document.getElementById('upload-text').innerText = 'Pilih Foto';
-    base64Img = null;
+    try {
+      await window.fsAddProduct(payload);
+      toggleForm();
+      showToast('Produk berhasil ditambahkan!', 'success');
+      
+      // Reset form
+      document.getElementById('inp-nama').value = '';
+      document.getElementById('inp-harga').value = '';
+      document.getElementById('inp-wa').value = '';
+      document.getElementById('inp-harga-coret').value = '';
+      document.getElementById('inp-promo').value = '';
+      document.getElementById('preview-img').style.display = 'none';
+      document.getElementById('upload-text').innerText = 'Pilih Foto dari Galeri';
+      base64Img = null;
+    } catch (error) {
+      showToast('Gagal menyimpan produk!', 'error');
+    } finally {
+      btn.innerText = originalText;
+      btn.disabled = false;
+    }
   }
 
   async function hapusProduk(id) {
@@ -219,21 +273,25 @@
 
   function loadDashboard() {
     window.fsListenProducts((data) => {
-      products = data;
-      document.getElementById('admin-product-list').innerHTML = products.length ? products.map(p => `
-        <div class="admin-product-item">
-          <img src="${p.image}">
-          <div style="flex:1;">
-            <h4 style="font-size:15px; font-weight:700; color: #fff;">${p.name}</h4>
-            <div style="font-size:12px; color:var(--text-muted); margin: 4px 0;">${p.kategori}</div>
-            <div style="font-size:15px; color:var(--theme-blue); font-weight:800;">Rp ${Number(p.price).toLocaleString('id-ID')}</div>
+      const list = document.getElementById('admin-product-list');
+      
+      if (data.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size: 15px;">Belum ada produk di server.</p>';
+      } else {
+        list.innerHTML = data.map(p => `
+          <div class="admin-product-item">
+            <img src="${p.image}">
+            <div style="flex:1;">
+              <h4 style="font-size:16px; font-weight:700; color: #fff; margin-bottom: 6px;">${p.name}</h4>
+              <div style="font-size:13px; color:var(--text-muted); margin-bottom: 8px;">${p.kategori}</div>
+              <div style="font-size:16px; color:var(--theme-blue); font-weight:800;">Rp ${Number(p.price).toLocaleString('id-ID')}</div>
+            </div>
+            <button class="btn-icon" onclick="hapusProduk('${p.id}')"><i class="fa-solid fa-trash"></i></button>
           </div>
-          <button class="btn-icon" onclick="hapusProduk('${p.id}')"><i class="fa-solid fa-trash"></i></button>
-        </div>
-      `).join('') : '<p style="text-align:center; color:#888; padding: 20px;">Belum ada produk.</p>';
+        `).join('');
+      }
 
-      // Render Log (Karena Firebase nggak nyimpen log otomatis, kita tampilin dummy aja atau urungkan)
-      document.getElementById('log-list').innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:14px;">Aktivitas tersimpan di server Firebase.</p>`;
+      document.getElementById('log-list').innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:14px;">Data tersinkronisasi dengan server Firebase.</p>`;
     });
   }
 
