@@ -265,7 +265,7 @@
     form.classList.toggle('show'); 
   }
 
-  // FUNGSI SIMPAN PRODUK
+  // FUNGSI SIMPAN PRODUK (PAKE TIMEOUT BIAR GAK NGE-HANG)
   async function tambahProduk() {
     const name = document.getElementById('inp-nama').value;
     const price = document.getElementById('inp-harga').value;
@@ -291,8 +291,13 @@
     };
 
     try {
-      // Tembak ke Firebase
-      await window.fsAddProduct(payload);
+      // Paksa batal kalau lebih dari 10 detik (Timeout)
+      const timeoutPromise = new Promise((_, reject) => 
+        setTimeout(() => reject(new Error("Timeout")), 10000)
+      );
+
+      // Balapan antara upload ke Firebase vs Timeout
+      await Promise.race([window.fsAddProduct(payload), timeoutPromise]);
       
       // Kalau sukses
       toggleForm();
@@ -310,9 +315,10 @@
       
     } catch (error) {
       console.error(error);
-      showToast('Gagal upload! Cek koneksi atau config Firebase.', 'error');
+      // Munculin pesan error kalau gagal
+      showToast('Gagal! Cek Rules Firebase atau Koneksi.', 'error');
     } finally {
-      // Balikin tombol ke normal
+      // Balikin tombol ke normal (apapun hasilnya)
       btn.disabled = false;
       btnText.innerText = 'SIMPAN PRODUK';
     }
