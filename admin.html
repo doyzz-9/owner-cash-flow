@@ -3,178 +3,178 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>JB Cash Flow</title>
+<title>JB Cash Flow Admin</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
   :root { 
     --bg-dark: #09090b; 
     --surface-dark: #18181b; 
-    --theme-color: #007aff; 
-    --text-main: #fafafa;
+    --surface-light: #27272a;
+    --theme-blue: #007aff; 
+    --theme-red: #ef4444; 
+    --theme-green: #10b981; 
+    --text-main: #fafafa; 
     --text-muted: #a1a1aa;
-    --spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    --ios-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
   }
   * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-  body { 
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; 
-    background: var(--bg-dark); 
-    color: var(--text-main); 
-    padding-bottom: 110px; 
-    overflow-x: hidden;
-  }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-dark); color: var(--text-main); }
   
-  /* ANIMASI PAGE LOAD */
-  .fade-up { opacity: 0; transform: translateY(20px); animation: fadeUp 0.6s var(--spring) forwards; }
-  @keyframes fadeUp { to { opacity: 1; transform: translateY(0); } }
+  .page { display: none; min-height: 100vh; } 
+  .page.active { display: block; animation: fadeIn 0.4s var(--ios-spring); }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-  /* TOPBAR */
-  .topbar { 
-    display: flex; align-items: center; gap: 16px; padding: 18px 24px; 
-    background: rgba(9, 9, 11, 0.85); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; z-index: 50; 
-    animation: slideDown 0.5s var(--spring);
+  /* CUSTOM TOAST NOTIFIKASI */
+  .toast-container { position: fixed; top: 24px; left: 0; width: 100%; display: flex; flex-direction: column; align-items: center; z-index: 9999; pointer-events: none; }
+  .toast { 
+    background: var(--surface-dark); color: #fff; padding: 16px 24px; border-radius: 16px; font-size: 14px; font-weight: 600; 
+    margin-bottom: 10px; transition: 0.4s var(--ios-spring); opacity: 0; transform: translateY(-30px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.1);
+    display: flex; align-items: center; gap: 12px;
   }
-  @keyframes slideDown { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-  
-  .brand { font-weight: 800; font-size: 20px; color: var(--theme-color); white-space: nowrap; letter-spacing: -0.5px; }
-  .search-wrap { 
-    flex: 1; display: flex; align-items: center; background: #27272a; 
-    border-radius: 14px; padding: 12px 16px; gap: 10px; border: 1px solid rgba(255,255,255,0.05);
-    transition: all 0.3s var(--spring);
-  }
-  .search-wrap:focus-within { border-color: var(--theme-color); box-shadow: 0 0 0 3px rgba(0,122,255,0.2); }
-  .search-wrap input { border: none; background: transparent; outline: none; font-size: 15px; width: 100%; color: #fff; }
-  .search-wrap input::placeholder { color: var(--text-muted); }
-  
-  .scroll-area { padding: 24px 24px 0; }
+  .toast.show { opacity: 1; transform: translateY(0); }
+  .toast.success { border-left: 4px solid var(--theme-green); } 
+  .toast.error { border-left: 4px solid var(--theme-red); }
 
-  /* BANNER */
-  .banner-card { border-radius: 24px; overflow: hidden; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-  .banner-img { display: block; width: 100%; transition: transform 0.5s var(--spring); }
-  .banner-card:hover .banner-img { transform: scale(1.05); }
+  /* LOGIN */
+  .login-container { height: 100vh; display: flex; flex-direction: column; justify-content: center; padding: 32px; background: radial-gradient(circle at top right, rgba(0,122,255,0.15), var(--bg-dark) 60%); }
+  .login-form { background: var(--surface-dark); padding: 32px; border-radius: 32px; border: 1px solid rgba(255,255,255,0.08); box-shadow: 0 20px 40px rgba(0,0,0,0.5); display: flex; flex-direction: column; gap: 20px; }
+  .input-group input { width: 100%; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); font-size: 16px; background: var(--surface-light); color: #fff; outline: none; transition: 0.3s; font-weight: 500; }
+  .input-group input:focus { border-color: var(--theme-blue); box-shadow: 0 0 0 4px rgba(0,122,255,0.2); }
+  
+  .btn-primary { 
+    padding: 18px; background: var(--theme-blue); color: #fff; border: none; border-radius: 16px; 
+    font-size: 16px; font-weight: 700; width: 100%; cursor: pointer; 
+    transition: 0.2s var(--ios-spring); box-shadow: 0 8px 20px rgba(0,122,255,0.3); 
+    display: flex; justify-content: center; align-items: center; gap: 10px;
+  }
+  .btn-primary:active { transform: scale(0.96); box-shadow: none; }
+  .btn-primary:disabled { background: #333; color: #888; box-shadow: none; cursor: not-allowed; }
 
-  /* KATEGORI */
-  .kategori-sec { margin-top: 32px; }
-  .kategori-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; }
-  .kat-item { display: flex; flex-direction: column; align-items: center; gap: 12px; font-size: 12px; font-weight: 600; color: var(--text-muted); cursor: pointer; }
-  .kat-icon { 
-    width: 60px; height: 60px; border-radius: 20px; display: flex; align-items: center; justify-content: center; 
-    font-size: 24px; background: var(--surface-dark); color: var(--theme-color); 
-    border: 1px solid rgba(255,255,255,0.05); transition: all 0.4s var(--spring);
+  /* DASHBOARD */
+  .dashboard-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); position: sticky; top: 0; background: rgba(9,9,11,0.9); backdrop-filter: blur(20px); z-index: 10; }
+  .dashboard-content { padding: 24px; padding-bottom: 100px; }
+  
+  .admin-product-item { 
+    display: flex; align-items: center; gap: 16px; background: var(--surface-dark); 
+    padding: 16px; border-radius: 20px; margin-bottom: 16px; border: 1px solid rgba(255,255,255,0.05); 
+    animation: slideUp 0.4s var(--ios-spring) forwards; opacity: 0; transform: translateY(20px);
   }
-  .kat-item:active .kat-icon { transform: scale(0.85); }
-  .kat-item.active .kat-icon { 
-    background: var(--theme-color); color: #fff; 
-    box-shadow: 0 8px 24px rgba(0,122,255,0.4); border-color: transparent; 
-    transform: translateY(-5px);
-  }
-  .kat-item.active span { color: #fff; font-weight: 700; }
+  @keyframes slideUp { to { opacity: 1; transform: translateY(0); } }
 
-  /* GRID PRODUK + STAGGERED ANIMATION */
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 20px; margin-top: 32px; }
-  
-  .card { 
-    background: var(--surface-dark); border: 1px solid rgba(255,255,255,0.05); 
-    border-radius: 24px; padding: 16px; display: flex; flex-direction: column; 
-    transition: transform 0.3s var(--spring), box-shadow 0.3s var(--spring);
-    opacity: 0; transform: translateY(30px); animation: cardPop 0.5s var(--spring) forwards;
-  }
-  @keyframes cardPop { to { opacity: 1; transform: translateY(0); } }
-  .card:active { transform: scale(0.94); box-shadow: 0 0 20px rgba(0,0,0,0.5); }
+  .admin-product-item img { width: 80px; height: 80px; border-radius: 16px; object-fit: cover; }
+  .btn-icon { background: rgba(255,59,48,0.15); color: var(--theme-red); border: none; width: 48px; height: 48px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 18px; cursor: pointer; flex-shrink: 0; transition: 0.2s; }
+  .btn-icon:active { transform: scale(0.9); }
 
-  .card-img-wrap { position: relative; width: 100%; aspect-ratio: 1/1; border-radius: 16px; overflow: hidden; margin-bottom: 16px; background: #000; }
-  .card-img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.4s var(--spring); }
-  .card:hover .card-img { transform: scale(1.1); }
-  
-  .promo-badge { 
-    position: absolute; top: 10px; left: 10px; background: #ef4444; color: #fff; 
-    font-size: 11px; font-weight: 800; padding: 6px 10px; border-radius: 10px; z-index: 2;
-    animation: pulseGlow 2s infinite;
+  /* FORM FULL SCREEN */
+  .form-overlay { 
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg-dark); 
+    z-index: 100; display: flex; flex-direction: column; transform: translateY(100%); 
+    transition: transform 0.4s var(--ios-spring); 
   }
-  @keyframes pulseGlow { 0% { box-shadow: 0 0 0 0 rgba(239,68,68,0.7); } 70% { box-shadow: 0 0 0 10px rgba(239,68,68,0); } 100% { box-shadow: 0 0 0 0 rgba(239,68,68,0); } }
-
-  .card .name { font-size: 15px; font-weight: 700; margin-bottom: 10px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.4; }
-  .price-wrap { margin-top: auto; display: flex; flex-direction: column; gap: 4px; }
-  .price-old { font-size: 12px; color: var(--text-muted); text-decoration: line-through; }
-  .price { font-size: 18px; font-weight: 800; color: var(--theme-color); }
+  .form-overlay.show { transform: translateY(0); }
+  .form-header { display: flex; justify-content: space-between; align-items: center; padding: 24px; border-bottom: 1px solid rgba(255,255,255,0.05); background: rgba(9,9,11,0.9); position: sticky; top: 0; }
+  .form-body { padding: 24px; flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 20px; }
   
-  .wa-btn { 
-    display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 16px; padding: 14px; 
-    background: #10b981; color: #fff; font-weight: 700; font-size: 14px; border-radius: 16px; text-decoration: none; 
-    transition: transform 0.2s var(--spring), background 0.2s;
+  .form-card { display: flex; flex-direction: column; gap: 16px; }
+  .form-card input, .form-card select { 
+    width: 100%; padding: 18px; border-radius: 16px; border: 1px solid rgba(255,255,255,0.1); 
+    font-size: 15px; background: var(--surface-light); color: #fff; outline: none; transition: 0.2s; font-family: inherit; 
   }
-  .wa-btn:hover { background: #059669; }
-  .wa-btn:active { transform: scale(0.92); }
+  .form-card input:focus, .form-card select:focus { border-color: var(--theme-blue); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
   
-  /* BOTTOM NAV */
-  .bottom-nav { 
-    position: fixed; bottom: 24px; left: 24px; right: 24px; display: flex; justify-content: space-around; 
-    background: rgba(24, 24, 27, 0.9); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
-    border-radius: 28px; padding: 12px; border: 1px solid rgba(255,255,255,0.08); z-index: 60; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
-    animation: slideUp 0.6s var(--spring);
+  .upload-area { 
+    border: 2px dashed rgba(255,255,255,0.2); border-radius: 20px; padding: 32px; 
+    text-align: center; cursor: pointer; background: var(--surface-light); color: var(--text-muted); transition: 0.2s; 
   }
-  @keyframes slideUp { from { transform: translateY(100%); } to { transform: translateY(0); } }
-  
-  .bn-item { display: flex; flex-direction: column; align-items: center; gap: 6px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-decoration: none; padding: 10px 24px; border-radius: 20px; transition: all 0.3s var(--spring); }
-  .bn-item i { font-size: 22px; transition: transform 0.3s var(--spring); }
-  .bn-item:active i { transform: scale(0.7); }
-  .bn-item.active { color: var(--theme-color); background: rgba(0,122,255,0.15); }
-  
-  /* MODAL */
-  .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(5px); z-index: 100; display: flex; align-items: flex-end; opacity: 0; pointer-events: none; transition: opacity 0.3s; }
-  .modal-overlay.show { opacity: 1; pointer-events: auto; }
-  .modal-content { background: var(--surface-dark); width: 100%; border-radius: 32px 32px 0 0; padding: 32px 24px 48px; transform: translateY(100%); transition: transform 0.4s var(--spring); border-top: 1px solid rgba(255,255,255,0.1); }
-  .modal-overlay.show .modal-content { transform: translateY(0); }
+  .upload-area:hover { border-color: var(--theme-blue); color: var(--theme-blue); }
+  .upload-area img { max-width: 100%; max-height: 180px; border-radius: 16px; margin-top: 16px; object-fit: cover; }
 </style>
 </head>
 <body>
 
-<header class="topbar">
-  <div class="brand">JB CASH FLOW</div>
-  <div class="search-wrap">
-    <i class="fa-solid fa-magnifying-glass" style="color: var(--text-muted);"></i>
-    <input type="text" id="search-input" placeholder="Cari akun, item...">
-  </div>
-</header>
+<!-- NOTIFIKASI -->
+<div class="toast-container" id="toast-container"></div>
 
-<div class="scroll-area">
-  <div class="banner-card fade-up" style="animation-delay: 0.1s;">
-    <img src="https://cdn.imagetourls.com/uploads/tyImg/FPWXGXn3.jpg" class="banner-img">
-  </div>
-
-  <section class="kategori-sec fade-up" style="animation-delay: 0.2s;">
-    <div class="kategori-grid" id="category-list">
-      <div class="kat-item active" onclick="filterCategory('Semua', this)"><div class="kat-icon"><i class="fa-solid fa-layer-group"></i></div><span>SEMUA</span></div>
-      <div class="kat-item" onclick="filterCategory('Free Fire', this)"><div class="kat-icon"><i class="fa-solid fa-fire"></i></div><span>FREE FIRE</span></div>
-      <div class="kat-item" onclick="filterCategory('Mobile Legends', this)"><div class="kat-icon"><i class="fa-solid fa-shield-halved"></i></div><span>MLBB</span></div>
-      <div class="kat-item" onclick="filterCategory('Flash Sale', this)"><div class="kat-icon"><i class="fa-solid fa-bolt"></i></div><span>FLASH SALE</span></div>
-      <div class="kat-item" onclick="filterCategory('Pelajar', this)"><div class="kat-icon"><i class="fa-solid fa-graduation-cap"></i></div><span>PELAJAR</span></div>
+<!-- HALAMAN LOGIN -->
+<div id="page-login" class="page active">
+  <div class="login-container">
+    <div class="login-form">
+      <h2 style="text-align:center; margin-bottom: 10px; color: #fff; font-size: 32px; letter-spacing: -1px; font-weight: 800;">JB CASH FLOW</h2>
+      <p style="text-align:center; color: var(--text-muted); margin-bottom: 20px; font-size: 14px;">Masuk ke Dashboard Admin</p>
+      <div class="input-group"><input type="text" id="login-username" placeholder="Username"></div>
+      <div class="input-group"><input type="password" id="login-password" placeholder="Password"></div>
+      <button class="btn-primary" onclick="doLogin()" style="margin-top: 10px;">MASUK</button>
     </div>
-  </section>
-
-  <section class="fade-up" style="animation-delay: 0.3s;">
-    <div id="product-grid" class="grid"></div>
-  </section>
-</div>
-
-<nav class="bottom-nav">
-  <a href="#" class="bn-item active" onclick="openModal('beranda')"><i class="fa-solid fa-house"></i><span>BERANDA</span></a>
-  <a href="#" class="bn-item" onclick="openModal('bantuan')"><i class="fa-solid fa-circle-question"></i><span>BANTUAN</span></a>
-</nav>
-
-<div class="modal-overlay" id="modal-overlay" onclick="closeModal(event)">
-  <div class="modal-content" onclick="event.stopPropagation()">
-    <h3 id="modal-title" style="text-align:center; margin-bottom: 24px; color: #fff; font-size: 22px;">Bantuan</h3>
-    <div id="modal-body" style="font-size:16px; line-height:1.7; color: var(--text-muted); text-align: center;"></div>
   </div>
 </div>
 
-<!-- FIREBASE SDK (GANTI CONFIG NYA!) -->
+<!-- HALAMAN DASHBOARD -->
+<div id="page-dashboard" class="page">
+  <div class="dashboard-header">
+    <h2 style="font-size: 22px; color: #fff; font-weight: 700;">Dashboard</h2>
+    <button class="btn-icon" style="width:auto; padding: 0 20px; background: rgba(255,255,255,0.1); color: #fff; font-weight: 600; font-size: 14px;" onclick="doLogout()">KELUAR</button>
+  </div>
+  <div class="dashboard-content">
+    <div style="display:flex; justify-content:space-between; align-items: center; margin-bottom: 24px;">
+      <h3 style="font-size: 20px; color: #fff; font-weight: 700;">Daftar Produk</h3>
+      <button class="btn-primary" style="width:auto; padding: 12px 24px; border-radius: 12px; font-size: 14px;" onclick="toggleForm()">+ Tambah</button>
+    </div>
+    
+    <div id="admin-product-list"></div>
+    
+    <h3 style="margin-top:40px; margin-bottom:20px; font-size: 20px; color: #fff; font-weight: 700;">Jejak Aktivitas</h3>
+    <div id="log-list" style="background: var(--surface-dark); padding: 24px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05);"></div>
+  </div>
+</div>
+
+<!-- FORM TAMBAH PRODUK (FULL SCREEN) -->
+<div class="form-overlay" id="form-overlay">
+  <div class="form-header">
+    <h3 style="font-size: 20px; color: #fff;">Tambah Produk</h3>
+    <button style="background: none; border: none; color: var(--text-muted); font-size: 16px; font-weight: 600; cursor: pointer; padding: 8px;" onclick="toggleForm()">BATAL</button>
+  </div>
+  <div class="form-body">
+    <div class="form-card">
+      <input type="text" id="inp-nama" placeholder="Nama Produk (Cth: Akun FF Sultan)">
+      <div class="form-row">
+        <input type="number" id="inp-harga" placeholder="Harga Jual">
+        <input type="number" id="inp-harga-coret" placeholder="Harga Coret">
+      </div>
+      <div class="form-row">
+        <select id="inp-kategori">
+          <option value="Free Fire">Free Fire</option>
+          <option value="Mobile Legends">Mobile Legends</option>
+          <option value="Flash Sale">Flash Sale</option>
+          <option value="Pelajar">Pelajar</option>
+        </select>
+        <input type="text" id="inp-wa" placeholder="No WA (628...)">
+      </div>
+      <div class="upload-area" onclick="document.getElementById('inp-file').click()">
+        <i class="fa-solid fa-cloud-arrow-up" style="font-size:32px; margin-bottom: 10px;"></i>
+        <p id="upload-text" style="font-weight: 600; font-size: 15px;">Pilih Foto dari Galeri</p>
+        <img id="preview-img" style="display:none;">
+      </div>
+      <input type="file" id="inp-file" accept="image/*" style="display: none;" onchange="previewGambar(event)">
+      <input type="text" id="inp-promo" placeholder="Label Promo (Opsional)">
+    </div>
+    
+    <!-- TOMBOL SIMPAN DENGAN LOADING STATE -->
+    <button class="btn-primary" id="btn-save" onclick="tambahProduk()" style="margin-top: 20px; padding: 20px; font-size: 18px;">
+      <span id="btn-save-text">SIMPAN PRODUK</span>
+    </button>
+  </div>
+</div>
+
+<!-- FIREBASE SDK -->
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getFirestore, collection, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
+  // ==========================================
+  // WAJIB GANTI CONFIG DI BAWAH INI PAKE PUNYA LO!
+  // ==========================================
   const firebaseConfig = {
     apiKey: "MASUKIN_API_KEY_LO",
     authDomain: "MASUKIN_AUTH_DOMAIN_LO",
@@ -183,11 +183,15 @@
     messagingSenderId: "MASUKIN_SENDER_ID_LO",
     appId: "MASUKIN_APP_ID_LO"
   };
+  // ==========================================
 
   const app = initializeApp(firebaseConfig);
   const db = getFirestore(app);
 
-  window.fetchProductsFromFirebase = function(callback) {
+  // Fungsi jembatan biar bisa dipanggil dari script biasa
+  window.fsAddProduct = async (data) => await addDoc(collection(db, "products"), data);
+  window.fsDeleteProduct = async (id) => await deleteDoc(doc(db, "products", id));
+  window.fsListenProducts = (callback) => {
     onSnapshot(collection(db, "products"), (snapshot) => {
       const prods = [];
       snapshot.forEach(doc => prods.push({ id: doc.id, ...doc.data() }));
@@ -196,93 +200,163 @@
   }
 </script>
 
+<!-- LOGIKA WEB ADMIN -->
 <script>
-  let allProducts = [];
-  let currentCategory = 'Semua';
-  const themeColors = { 'Semua': '#007aff', 'Free Fire': '#ef4444', 'Mobile Legends': '#8b5cf6', 'Flash Sale': '#f59e0b', 'Pelajar': '#007aff' };
-  const grid = document.getElementById('product-grid');
-  const searchInput = document.getElementById('search-input');
+  let base64Img = null;
+  let token = localStorage.getItem('admin_token') || null;
 
-  function formatRupiah(n) { return 'Rp ' + Number(n).toLocaleString('id-ID'); }
+  // NOTIFIKASI CUSTOM
+  function showToast(msg, type) {
+    const c = document.getElementById('toast-container');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}" style="font-size:20px; color:${type === 'success' ? 'var(--theme-green)' : 'var(--theme-red)'}"></i> ${msg}`;
+    c.appendChild(t);
+    setTimeout(() => t.classList.add('show'), 10);
+    setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 300); }, 3000);
+  }
 
-  function renderProducts() {
-    let filtered = allProducts;
-    if (currentCategory !== 'Semua') filtered = filtered.filter(p => p.kategori === currentCategory);
-    const q = searchInput.value.toLowerCase();
-    if (q) filtered = filtered.filter(p => p.name.toLowerCase().includes(q));
+  function showPage(id) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
 
-    if (!filtered.length) {
-      grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 60px 0; opacity: 0.5;"><i class="fa-solid fa-box-open" style="font-size: 48px; margin-bottom: 16px; color: var(--text-muted);"></i><p style="font-size: 16px; color: var(--text-muted);">Belum ada produk di sini.</p></div>`;
-      return;
+  function doLogin() {
+    const user = document.getElementById('login-username').value;
+    const pass = document.getElementById('login-password').value;
+    
+    if (user === 'JB Cash Flow' && pass === '12123242') {
+      localStorage.setItem('admin_token', 'admin');
+      showPage('page-dashboard');
+      showToast('Login Berhasil!', 'success');
+    } else { showToast('Username atau Password salah!', 'error'); }
+  }
+
+  function doLogout() {
+    localStorage.removeItem('admin_token');
+    showPage('page-login');
+  }
+
+  // AUTO RESIZE FOTO (BIAR RINGAN)
+  function previewGambar(e) {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(ev) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 400;
+          canvas.height = img.height * (400 / img.width);
+          canvas.getContext('2d').drawImage(img, 0, 0, canvas.width, canvas.height);
+          base64Img = canvas.toDataURL('image/jpeg', 0.6);
+          document.getElementById('preview-img').src = base64Img;
+          document.getElementById('preview-img').style.display = 'block';
+          document.getElementById('upload-text').innerText = 'Ganti Foto';
+        };
+        img.src = ev.target.result;
+      };
+      reader.readAsDataURL(file);
     }
+  }
 
-    grid.innerHTML = filtered.map((p, index) => {
-      let discountPct = "";
-      if (p.old_price && p.old_price > p.price) discountPct = Math.round(((p.old_price - p.price) / p.old_price) * 100) + "% OFF";
-      const waText = `Halo%20Admin%20JB%20Cash%20Flow,%20saya%20tertarik%20untuk%20membeli%20produk%20*${encodeURIComponent(p.name)}*.%20Apakah%20stoknya%20masih%20ada?`;
+  function toggleForm() { 
+    const form = document.getElementById('form-overlay');
+    form.classList.toggle('show'); 
+  }
+
+  // FUNGSI SIMPAN PRODUK
+  async function tambahProduk() {
+    const name = document.getElementById('inp-nama').value;
+    const price = document.getElementById('inp-harga').value;
+    const wa = document.getElementById('inp-wa').value;
+    
+    if(!name || !price || !wa) return showToast('Nama, Harga, dan WA wajib diisi!', 'error');
+
+    // UBAH TOMBOL JADI LOADING
+    const btn = document.getElementById('btn-save');
+    const btnText = document.getElementById('btn-save-text');
+    btn.disabled = true;
+    btnText.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> MENYIMPAN...';
+
+    const payload = {
+      name: name,
+      price: price,
+      wa: wa,
+      old_price: document.getElementById('inp-harga-coret').value || null,
+      kategori: document.getElementById('inp-kategori').value,
+      image: base64Img || 'https://placehold.co/400x400/18181b/a1a1aa?text=No+Img',
+      promo: document.getElementById('inp-promo').value,
+      created_at: Date.now()
+    };
+
+    try {
+      // Tembak ke Firebase
+      await window.fsAddProduct(payload);
       
-      // ANIMASI STAGGERED (Muncul berurutan)
-      const delay = index * 0.1;
-
-      return `
-      <div class="card" style="animation-delay: ${delay}s;">
-        <div class="card-img-wrap">
-          ${discountPct ? `<div class="promo-badge">${discountPct}</div>` : ''}
-          <img src="${p.image || 'https://placehold.co/400x400/18181b/a1a1aa?text=No+Img'}" class="card-img" loading="lazy">
-        </div>
-        <div class="name">${p.name}</div>
-        <div class="price-wrap">
-          ${p.old_price ? `<span class="price-old">${formatRupiah(p.old_price)}</span>` : ''}
-          <div class="price">${formatRupiah(p.price)}</div>
-        </div>
-        <a class="wa-btn" href="https://wa.me/${p.wa}?text=${waText}" target="_blank">
-          <i class="fa-brands fa-whatsapp"></i> BELI
-        </a>
-      </div>`;
-    }).join('');
-  }
-
-  function filterCategory(cat, el) {
-    currentCategory = cat;
-    const color = themeColors[cat];
-    document.documentElement.style.setProperty('--theme-color', color);
-    document.querySelectorAll('.kat-item').forEach(item => item.classList.remove('active'));
-    if(el) el.classList.add('active');
-    
-    // Animasi ulang grid tiap ganti kategori
-    grid.style.animation = 'none';
-    grid.offsetHeight; 
-    grid.style.animation = '';
-    
-    renderProducts();
-  }
-
-  searchInput.addEventListener('input', renderProducts);
-
-  const overlay = document.getElementById('modal-overlay');
-  function openModal(type) {
-    if (type === 'beranda') {
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      document.querySelectorAll('.bn-item')[0].classList.add('active');
-      document.querySelectorAll('.bn-item')[1].classList.remove('active');
-      return;
-    }
-    if (type === 'bantuan') {
-      document.querySelectorAll('.bn-item')[1].classList.add('active');
-      document.querySelectorAll('.bn-item')[0].classList.remove('active');
-      document.getElementById('modal-body').innerText = "Hubungi admin JB Cash Flow di +62 883-8003-5722 untuk bantuan.";
-      overlay.classList.add('show');
+      // Kalau sukses
+      toggleForm();
+      showToast('Produk berhasil di-upload ke server!', 'success');
+      
+      // Reset Form
+      document.getElementById('inp-nama').value = '';
+      document.getElementById('inp-harga').value = '';
+      document.getElementById('inp-wa').value = '';
+      document.getElementById('inp-harga-coret').value = '';
+      document.getElementById('inp-promo').value = '';
+      document.getElementById('preview-img').style.display = 'none';
+      document.getElementById('upload-text').innerText = 'Pilih Foto dari Galeri';
+      base64Img = null;
+      
+    } catch (error) {
+      console.error(error);
+      showToast('Gagal upload! Cek koneksi atau config Firebase.', 'error');
+    } finally {
+      // Balikin tombol ke normal
+      btn.disabled = false;
+      btnText.innerText = 'SIMPAN PRODUK';
     }
   }
 
-  function closeModal(e) {
-    if (e.target.id === 'modal-overlay') overlay.classList.remove('show');
+  async function hapusProduk(id) {
+    if(confirm('Hapus produk ini (Laku)?')) {
+      await window.fsDeleteProduct(id);
+      showToast('Produk berhasil dihapus!', 'success');
+    }
   }
 
-  window.fetchProductsFromFirebase((data) => {
-    allProducts = data;
-    renderProducts();
-  });
+  // TAMPILIN DATA DI DASHBOARD
+  function loadDashboard() {
+    window.fsListenProducts((data) => {
+      const list = document.getElementById('admin-product-list');
+      
+      if (data.length === 0) {
+        list.innerHTML = '<p style="text-align:center; color:var(--text-muted); padding: 40px 0; font-size: 15px;">Belum ada produk di server.</p>';
+      } else {
+        list.innerHTML = data.map((p, i) => `
+          <div class="admin-product-item" style="animation-delay: ${i * 0.05}s">
+            <img src="${p.image}">
+            <div style="flex:1;">
+              <h4 style="font-size:16px; font-weight:700; color: #fff; margin-bottom: 6px;">${p.name}</h4>
+              <div style="font-size:13px; color:var(--text-muted); margin-bottom: 8px;">${p.kategori}</div>
+              <div style="font-size:16px; color:var(--theme-blue); font-weight:800;">Rp ${Number(p.price).toLocaleString('id-ID')}</div>
+            </div>
+            <button class="btn-icon" onclick="hapusProduk('${p.id}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        `).join('');
+      }
+
+      document.getElementById('log-list').innerHTML = `<p style="text-align:center; color:var(--text-muted); font-size:14px;">Data tersinkronisasi dengan server Firebase.</p>`;
+    });
+  }
+
+  // CEK SESI LOGIN PAS AWAL BUKA
+  if (token) { 
+    showPage('page-dashboard'); 
+    loadDashboard(); 
+  } else { 
+    showPage('page-login'); 
+  }
 </script>
 </body>
 </html>
